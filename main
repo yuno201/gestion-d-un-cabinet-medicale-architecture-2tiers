@@ -1,0 +1,817 @@
+package tp3;
+import javax.swing.*;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+import javax.swing.table.DefaultTableModel;
+
+
+
+public class GestionCabinet {
+	public static void main(String[] args) throws ClassNotFoundException, SQLException{
+		
+		//étape 1: charger la classe de driver
+		Class.forName("oracle.jdbc.driver.OracleDriver"); 
+		//étape 2: créer l'objet de connexion
+		Connection con = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:xe","SYSTEM","prepa"); 
+		//authentification
+		JFrame f = new JFrame("authentification"); 
+		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		JLabel l = new JLabel("nom d'utilisateur: ");
+		 l.setBounds(20,20, 250,35);  
+	   JTextField user = new JTextField();
+	   user.setBounds(20,60,250,35);
+	   l.setFont(new Font("Comic sans ms", Font.PLAIN, 18));
+	   l.setForeground(Color.DARK_GRAY);
+	   JLabel l1 = new JLabel("mot de passe: ");
+		 l1.setBounds(20,100, 250,35);
+		 JTextField pass = new JTextField();
+		 l1.setFont(new Font("Comic sans ms", Font.PLAIN, 18));
+		 l1.setForeground(Color.DARK_GRAY);
+		    pass.setBounds(20,140,250,35);
+		    JButton b = new JButton("SUBMIT");
+		    b.setBackground(Color.lightGray);
+		    b.setFont(new Font("comic sand ms", Font.PLAIN, 18));
+		    b.setBounds(20,200,250,35);
+		    f.add(l);
+		    f.add(user);
+		    f.add(l1);
+		   f.add(pass);
+		    f.add(b);
+		    f.setSize(350,350);
+		    f.setLayout(null);
+		    f.setVisible(true);
+		 // chnowa isir ki nnzel aal button
+		    b.addActionListener(new ActionListener(){
+		        public void actionPerformed(ActionEvent e){
+		        	try {
+		        		Statement stmt1 = con.createStatement(); 
+		        		ResultSet res2 = stmt1.executeQuery("select count(*) from auth where username='"+user.getText()+"' and password='"+pass.getText()+"'");
+		        		res2.next();
+		        	      int count = res2.getInt(1);
+		        	      if(count==1) {
+		        	    	//si authen==true
+		        	  		JFrame jf = new JFrame("Gestion d'un cabinet Médicale"); 
+		        	  		jf.setBounds(200, 100, 800, 600); 
+		        	  		jf.setSize(500, 400);
+		        	  		jf.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		        	  		JPanel panel=new JPanel();
+		        	  		panel.setLayout(null);
+		        	  		jf.setContentPane(panel);
+		        	  		JMenuBar barreDeMenu = new JMenuBar();
+		        	  		panel.add(barreDeMenu);
+		        	  		barreDeMenu.setBounds(0, 0, 500, 30);
+		        	  		JMenu menu1 = new JMenu("Gestion des patients");
+		        	  		JMenu menu2 = new JMenu("Gestion des RDV");
+		        	  		JMenu menu3= new JMenu("Gestion des ordonnances");
+		        	  		JMenu menu4=new JMenu("Quitter");
+		        	  		JMenuItem item1 = new JMenuItem("Afficher Patient"); 
+		        	  		JMenuItem item2 = new JMenuItem("Ajouter Patient"); 
+		        	  		JMenuItem item3 = new JMenuItem("Modifier Patient"); 
+		        	  		JMenuItem item4 = new JMenuItem("Supprimer Patient");
+		        	  		JMenuItem item5 = new JMenuItem("Afficher RDV"); 
+		        	  		JMenuItem item6 = new JMenuItem("Ajouter RDV"); 
+		        	  		JMenuItem item7 = new JMenuItem("Modifier RDV"); 
+		        	  		JMenuItem item8 = new JMenuItem("Supprimer RDV");
+		        	  		JMenuItem item9 = new JMenuItem("Afficher ordonnance"); 
+		        	  		JMenuItem item10 = new JMenuItem("Ajouter ordonnance"); 
+		        	  		JMenuItem item11 = new JMenuItem("Modifier ordonnance"); 
+		        	  		JMenuItem item12 = new JMenuItem("Supprimer ordonnance");
+		        	  		JMenuItem item13 = new JMenuItem("Quitter gestion"); 
+		        	  		menu1.add(item1); 
+		        	  		menu1.add(item2);
+		        	  		menu1.add(item3);
+		        	  		menu1.add(item4);
+		        	  		menu2.add(item5); 
+		        	  		menu2.add(item6); 
+		        	  		menu2.add(item7);
+		        	  		menu2.add(item8);
+		        	  		menu3.add(item9); 
+		        	  		menu3.add(item10); 
+		        	  		menu3.add(item11);
+		        	  		menu3.add(item12);
+		        	  		menu4.add(item13); 
+		        	  		barreDeMenu.add(menu1); 
+		        	  		barreDeMenu.add(menu2); 
+		        	  		barreDeMenu.add(menu3); 
+		        	  		barreDeMenu.add(menu4);
+		        	  		item1.addActionListener(new ActionListener() { 
+		        				public void actionPerformed(ActionEvent e) { 
+		        				String columns[] = { "CIN", "Nom", "Prénom","Adresse","Age","Tel" }; 
+		        				int i = 0; 
+		        				try
+		        				{ 
+		        				//étape 3: créer l'objet statement 
+		        				Statement stmt = con.createStatement(); 
+		        				//étape 4: exécuter la requête
+		        				ResultSet res1 = stmt.executeQuery("SELECT COUNT(1) as NumberOfRows FROM patient"); 
+		        				res1.next(); 
+		        				int nbligne=res1.getInt("NumberOfRows"); 
+		        				String data[][] = new String[nbligne][6]; 
+		        				ResultSet res = stmt.executeQuery("select * from patient"); 
+		        				while(res.next()) 
+		        				 { 
+		        				 int CIN=res.getInt(1); 
+		        				 String nom=res.getString(2); 
+		        				 String prénom=res.getString(3); 
+		        				 String Adresse=res.getString(4);
+		        				 int Age=res.getInt(5);
+		        				 int Tel=res.getInt(6);
+		        				 data[i][0] = CIN + ""; 
+		        				 data[i][1] = nom; 
+		        				 data[i][2] = prénom; 
+		        				 data[i][3]=Adresse;
+		        				 data[i][4] =Age+""; 
+		        				 data[i][5]=Tel+"";
+		        				 i++; 
+		        				} 
+		        				DefaultTableModel model = new DefaultTableModel(data, columns); 
+		        				JTable table = new JTable(model); 
+		        				table.setShowGrid(true); 
+		        				table.setShowVerticalLines(true); 
+		        				JScrollPane pane = new JScrollPane(table); 
+		        				JFrame f = new JFrame("Liste Des Patients"); 
+		        				JPanel panel = new JPanel(); 
+		        				panel.add(pane); 
+		        				f.add(panel); 
+		        				f.setSize(500, 250); 
+		        				f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); 
+		        				f.setVisible(true); }
+		        				catch(Exception e1){ 
+		        				      System.out.println(e); 
+		        				}}}
+		        				); 
+		        			
+		        				//ajout patient
+		        			item2.addActionListener(new ActionListener() { 
+		        					public void actionPerformed(ActionEvent e) { 
+		        						  
+		        						  JFrame frame = new JFrame("ajouter patient");
+		        						  frame.getRootPane().setBorder(
+		        							        BorderFactory.createMatteBorder(4, 4, 4, 4, Color.black)
+		        							);
+		        						 JLabel l = new JLabel("cin: ");
+		        						 l.setBounds(20,20, 200,28);  
+		        						 l.setFont(new Font("Comic sans ms", Font.PLAIN, 20));
+		        						 l.setForeground(Color.DARK_GRAY);
+		        					    JTextField cin = new JTextField();
+		        					    cin.setBounds(120,20,200,28);
+		        					    JLabel l1 = new JLabel("nom: ");
+		        						 l1.setBounds(20,60, 200,28);
+		        						 l1.setFont(new Font("Comic sans ms", Font.PLAIN, 20));
+		        						 l1.setForeground(Color.DARK_GRAY);
+		        					    JTextField nom = new JTextField();
+		        					    nom.setBounds(120,60,200,28);
+		        					    JLabel l2 = new JLabel("prenom: ");
+		        						 l2.setBounds(20,100, 200,28);
+		        						 l2.setFont(new Font("Comic sans ms", Font.PLAIN, 20));
+		        						 l2.setForeground(Color.DARK_GRAY);
+		        					    JTextField prenom = new JTextField();
+		        					    prenom.setBounds(120,100,200,28);
+		        					    JLabel l3 = new JLabel("adresse: ");
+		        						 l3.setBounds(20,140, 200,28);
+		        						 l3.setFont(new Font("Comic sans ms", Font.PLAIN, 20));
+		        						 l3.setForeground(Color.DARK_GRAY);
+		        					    JTextField adresse = new JTextField();
+		        					    adresse.setBounds(120,140,200,28); 
+		        					    JLabel l4 = new JLabel("age: ");
+		        						 l4.setBounds(20,180, 200,28);
+		        						 l4.setFont(new Font("Comic sans ms", Font.PLAIN, 20));
+		        						 l4.setForeground(Color.DARK_GRAY);
+		        					    JTextField age = new JTextField();
+		        					    age.setBounds(120,180,200,28);
+		        					    JLabel l5 = new JLabel("tel: ");
+		        						 l5.setBounds(20,220, 200,28);
+		        						 l5.setFont(new Font("Comic sans ms", Font.PLAIN, 20));
+		        						 l5.setForeground(Color.DARK_GRAY);
+		        					    JTextField tel = new JTextField();
+		        					    tel.setBounds(120,220,200,28);
+		        					    //the submit button
+		        					    JButton b = new JButton("SUBMIT");
+		        					    b.setBounds(80,260,170,30);
+		        					    b.setFont(new Font("comic sand ms", Font.PLAIN, 18));
+		        					    b.setBackground(Color.gray);
+		        					    b.setForeground(Color.white);
+		        					    // chnowa isir ki nnzel aal button
+		        					    b.addActionListener(new ActionListener(){
+		        					        public void actionPerformed(ActionEvent e){
+		        					        	try {
+		        					        	Statement stmt1 = con.createStatement(); 
+		        								stmt1.executeUpdate("INSERT INTO patient(cin,nom,prenom,adresse,age,tel) " + "VALUES ("+cin.getText()+",'"+nom.getText()+"','"+prenom.getText()+"','"+adresse.getText()+"',"+age.getText()+","+tel.getText()+")");   
+		        					        }
+		        					        	catch(Exception e1){ 
+		        								      System.out.println(e1); 
+		        								}
+		        					        }
+		        					    });
+		        					    //
+		        					    frame.add(l);
+		        					    frame.add(cin); 
+		        					    frame.add(l1);
+		        					    frame.add(nom);
+		        					    frame.add(l2);
+		        					    frame.add(prenom); 
+		        					    frame.add(l3);
+		        					    frame.add(adresse);
+		        					    frame.add(l4);
+		        					    frame.add(age); 
+		        					    frame.add(l5);
+		        					    frame.add(tel);
+		        					    frame.add(b);
+		        					  
+		        					    frame.setSize(400,400);
+		        					    frame.setLayout(null);
+		        					    frame.setVisible(true);
+		        					 
+		        					        }});
+		        			//modifier patient
+		        			item3.addActionListener(new ActionListener() { 
+		        				public void actionPerformed(ActionEvent e) { 
+		        					  
+		        					  JFrame frame = new JFrame("modifier patient");
+		        					  
+		        					  frame.getRootPane().setBorder(
+		        						        BorderFactory.createMatteBorder(4, 4, 4, 4, Color.black)
+		        						);
+		        					 JLabel l = new JLabel("cin: ");
+		        					 l.setBounds(20,40, 200,28);  
+		        					 l.setFont(new Font("Comic sans ms", Font.PLAIN, 22));
+		        					 l.setForeground(Color.DARK_GRAY);
+		        				    JTextField cin = new JTextField();
+		        				    cin.setBounds(80,40,200,28);
+		        				    JLabel l1 = new JLabel("tel: ");
+		        					 l1.setBounds(20,80, 200,28);
+		        					 l1.setFont(new Font("Comic sans ms", Font.PLAIN, 22));
+		        					 l1.setForeground(Color.DARK_GRAY);
+		        				    JTextField tel = new JTextField();
+		        				    tel.setBounds(80,80,200,28);
+		        				    JButton b = new JButton("SUBMIT");
+		        				   
+		        				    b.setFont(new Font("comic sand ms", Font.PLAIN, 18));
+		        				    b.setBounds(100,120,150,28);
+		        				    b.setBackground(Color.gray);
+		        				    b.setForeground(Color.white);
+		        				 // chnowa isir ki nnzel aal button
+		        				    b.addActionListener(new ActionListener(){
+		        				        public void actionPerformed(ActionEvent e){
+		        				        	try {
+		        				        	Statement stmt2 = con.createStatement(); 
+		        							stmt2.executeUpdate("UPDATE patient "+"\n"+"SET tel = "+tel.getText()+"\n"+"WHERE cin = "+cin.getText());  
+		        							
+		        				        }
+		        				        	catch(Exception e1){ 
+		        							      System.out.println(e1); 
+		        							}
+		        				        }});
+		        				    frame.add(l);
+		        				    frame.add(cin); 
+		        				    frame.add(l1);
+		        				    frame.add(tel);
+		        				    frame.add(b);
+		        				    frame.setSize(400,250);
+		        				    frame.setLayout(null);
+		        				    frame.setVisible(true);
+		        				    
+		        				    
+		        				    
+		        				    
+		        				    }});
+		        			// supprimer un patient
+		        			item4.addActionListener(new ActionListener() { 
+		        				public void actionPerformed(ActionEvent e) { 
+		        					  
+		        					  JFrame frame = new JFrame("supprimer patient");
+		        					  frame.getRootPane().setBorder(
+		        						        BorderFactory.createMatteBorder(4, 4, 4, 4, Color.black)
+		        						);
+		        					 JLabel l = new JLabel("cin: ");
+		        					 l.setBounds(20,60, 200,28);  
+		        					 l.setFont(new Font("Comic sans ms", Font.PLAIN, 20));
+		        				    JTextField cin = new JTextField();
+		        				    cin.setBounds(60,60,200,28);
+		        				    
+		        				    JButton b = new JButton("SUBMIT");
+		        				   
+		        				    b.setFont(new Font("comic sand ms", Font.PLAIN, 18));
+		        				    b.setBounds(80,100,150,30);
+		        				    b.setBackground(Color.gray);
+		        				    b.setForeground(Color.white);
+		        				    l.setForeground(Color.DARK_GRAY);
+		        				    
+		        				    // chnowa isir ki nnzel aal button
+		        				    b.addActionListener(new ActionListener(){
+		        				        public void actionPerformed(ActionEvent e){
+		        				        	try {
+		        				        	Statement stmt3 = con.createStatement(); 
+		        							stmt3.executeUpdate("DELETE FROM patient WHERE cin= "+cin.getText());  
+		        							
+		        				        }
+		        				        	catch(Exception e1){ 
+		        							      System.out.println(e1); 
+		        							}
+		        				        }});
+		        				    
+		        				    frame.add(l);
+		        				    frame.add(cin); 
+		        				    
+		        				    frame.add(b);
+		        				    frame.setSize(300,250);
+		        				    frame.setLayout(null);
+		        				    frame.setVisible(true);
+		        				}});
+		        			// rdv
+		        			//affichage
+		        			item5.addActionListener(new ActionListener() { 
+		        				public void actionPerformed(ActionEvent e) { 
+		        				String columns[] = { "id","daterdv","heurerdv","cinpatient" }; 
+		        				int i = 0; 
+		        				try
+		        				{ 
+		        				
+		        				Statement stmt3 = con.createStatement(); 
+		        				
+		        				ResultSet res9 = stmt3.executeQuery("SELECT COUNT(1) as NumberOfRows FROM rdv"); 
+		        				res9.next(); 
+		        				int nbligne=res9.getInt("NumberOfRows"); 
+		        				String data[][] = new String[nbligne][6]; 
+		        				ResultSet res = stmt3.executeQuery("select * from rdv"); 
+		        				while(res.next()) 
+		        				 { 
+		        				 int id=res.getInt(1); 
+		        				 String daterdv=res.getString(2); 
+		        				 String heurerdv=res.getString(3); 
+		        				int cinpatient=res.getInt(4);
+		        				 
+		        				 data[i][0] = id + ""; 
+		        				 data[i][1] = daterdv; 
+		        				 data[i][2] = heurerdv; 
+		        				 data[i][3]= cinpatient+"";
+		        				
+		        				 i++; 
+		        				} 
+		        				DefaultTableModel model = new DefaultTableModel(data, columns); 
+		        				JTable table = new JTable(model); 
+		        				table.setShowGrid(true); 
+		        				table.setShowVerticalLines(true); 
+		        				JScrollPane pane = new JScrollPane(table); 
+		        				JFrame f = new JFrame("Liste Des rdv"); 
+		        				JPanel panel = new JPanel(); 
+		        				panel.add(pane); 
+		        				f.add(panel); 
+		        				f.setSize(500, 250); 
+		        				f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); 
+		        				f.setVisible(true); }
+		        				catch(Exception e1){ 
+		        				      System.out.println(e); 
+		        				}}}
+		        				); 
+		        			
+		        				//ajout rdv
+		        			item6.addActionListener(new ActionListener() { 
+		        					public void actionPerformed(ActionEvent e) { 
+		        						  
+		        						  JFrame frame = new JFrame("ajouter rdv");
+		        						  frame.getRootPane().setBorder(
+		        							        BorderFactory.createMatteBorder(4, 4, 4, 4, Color.black)
+		        							);
+		        						 JLabel l = new JLabel("id: ");
+		        						 l.setBounds(20,20, 200,28);  
+		        						 l.setFont(new Font("Comic sans ms", Font.PLAIN, 20));
+		        						 l.setForeground(Color.DARK_GRAY);
+		        					    JTextField id = new JTextField();
+		        					   id.setBounds(120,20,200,28);
+		        					    JLabel l1 = new JLabel("daterdv: ");
+		        						 l1.setBounds(20,60, 200,28);
+		        						 l1.setFont(new Font("Comic sans ms", Font.PLAIN, 20));
+		        						 l1.setForeground(Color.DARK_GRAY);
+		        					    JTextField daterdv = new JTextField();
+		        					    daterdv.setBounds(120,60,200,28);
+		        					    JLabel l2 = new JLabel("heurerdv: ");
+		        						 l2.setBounds(20,100, 200,28);
+		        						 l2.setFont(new Font("Comic sans ms", Font.PLAIN, 20));
+		        						 l2.setForeground(Color.DARK_GRAY);
+		        					    JTextField heurerdv = new JTextField();
+		        					    heurerdv.setBounds(120,100,200,28);
+		        					    JLabel l3 = new JLabel("cinpatient: ");
+		        						 l3.setBounds(20,140, 200,28);
+		        						 l3.setFont(new Font("Comic sans ms", Font.PLAIN, 20));
+		        						 l3.setForeground(Color.DARK_GRAY);
+		        					    JTextField cinpatient = new JTextField();
+		        					    cinpatient.setBounds(120,140,200,28); 
+		        					    
+		        					    //the submit button
+		        					    JButton b = new JButton("SUBMIT");
+		        					    b.setBounds(80,260,170,30);
+		        					    b.setFont(new Font("comic sand ms", Font.PLAIN, 18));
+		        					    b.setBackground(Color.gray);
+		        					    b.setForeground(Color.white);
+		        					    // chnowa isir ki nnzel aal button
+		        					    b.addActionListener(new ActionListener(){
+		        					        public void actionPerformed(ActionEvent e){
+		        					        	try {
+		        					        	Statement stmt1 = con.createStatement(); 
+		        								stmt1.executeUpdate("INSERT INTO rdv(id,daterdv,heurerdv,cinpatient) " + "VALUES ("+id.getText()+","+"TO_DATE('"+daterdv.getText()+"','MM-DD-YYYY'),'"+heurerdv.getText()+"',"+cinpatient.getText()+")");   
+		        					        }
+		        					        	catch(Exception e1){ 
+		        								      System.out.println(e1); 
+		        								}
+		        					        }
+		        					    });
+		        					    //
+		        					    frame.add(l);
+		        					    frame.add(id); 
+		        					    frame.add(l1);
+		        					    frame.add(daterdv);
+		        					    frame.add(l2);
+		        					    frame.add(heurerdv); 
+		        					    frame.add(l3);
+		        					    frame.add(cinpatient);
+		        					    
+		        					    frame.add(b);
+		        					  
+		        					    frame.setSize(400,400);
+		        					    frame.setLayout(null);
+		        					    frame.setVisible(true);
+		        					 
+		        					        }});
+		        			//modifier rdv
+		        			item7.addActionListener(new ActionListener() { 
+		        				public void actionPerformed(ActionEvent e) { 
+		        					  
+		        					  JFrame frame = new JFrame("modifier rdv");
+		        					  
+		        					  frame.getRootPane().setBorder(
+		        						        BorderFactory.createMatteBorder(4, 4, 4, 4, Color.black)
+		        						);
+		        					 JLabel l = new JLabel("id: ");
+		        					 l.setBounds(20,40, 200,28);  
+		        					 l.setFont(new Font("Comic sans ms", Font.PLAIN, 22));
+		        					 l.setForeground(Color.DARK_GRAY);
+		        				    JTextField id = new JTextField();
+		        				    id.setBounds(120,40,200,28);
+		        				    JLabel l1 = new JLabel("heurerdv: ");
+		        					 l1.setBounds(20,80, 200,28);
+		        					 l1.setFont(new Font("Comic sans ms", Font.PLAIN, 22));
+		        					 l1.setForeground(Color.DARK_GRAY);
+		        				    JTextField heurerdv = new JTextField();
+		        				    heurerdv.setBounds(120,80,200,28);
+		        				    JButton b = new JButton("SUBMIT");
+		        				   
+		        				    b.setFont(new Font("comic sand ms", Font.PLAIN, 18));
+		        				    b.setBounds(100,120,150,28);
+		        				    b.setBackground(Color.gray);
+		        				    b.setForeground(Color.white);
+		        				 // chnowa isir ki nnzel aal button
+		        				    b.addActionListener(new ActionListener(){
+		        				        public void actionPerformed(ActionEvent e){
+		        				        	try {
+		        				        	Statement stmt2 = con.createStatement(); 
+		        							stmt2.executeUpdate("UPDATE rdv "+"\n"+"SET heurerdv = '"+heurerdv.getText()+"'\n"+"WHERE id = "+id.getText());  
+		        							
+		        				        }
+		        				        	catch(Exception e1){ 
+		        							      System.out.println(e1); 
+		        							}
+		        				        }});
+		        				    frame.add(l);
+		        				    frame.add(id); 
+		        				    frame.add(l1);
+		        				    frame.add(heurerdv);
+		        				    frame.add(b);
+		        				    frame.setSize(400,250);
+		        				    frame.setLayout(null);
+		        				    frame.setVisible(true);
+		        				    
+		        				    
+		        				    
+		        				    
+		        				    }});
+		        			// supprimer un rdv
+		        			item8.addActionListener(new ActionListener() { 
+		        				public void actionPerformed(ActionEvent e) { 
+		        					  
+		        					  JFrame frame = new JFrame("supprimer rdv");
+		        					  frame.getRootPane().setBorder(
+		        						        BorderFactory.createMatteBorder(4, 4, 4, 4, Color.black)
+		        						);
+		        					 JLabel l = new JLabel("id: ");
+		        					 l.setBounds(20,60, 200,28);  
+		        					 l.setFont(new Font("Comic sans ms", Font.PLAIN, 20));
+		        				    JTextField id = new JTextField();
+		        				    id.setBounds(60,60,200,28);
+		        				    
+		        				    JButton b = new JButton("SUBMIT");
+		        				   
+		        				    b.setFont(new Font("comic sand ms", Font.PLAIN, 18));
+		        				    b.setBounds(80,100,150,30);
+		        				    b.setBackground(Color.gray);
+		        				    b.setForeground(Color.white);
+		        				    l.setForeground(Color.DARK_GRAY);
+		        				    
+		        				    // chnowa isir ki nnzel aal button
+		        				    b.addActionListener(new ActionListener(){
+		        				        public void actionPerformed(ActionEvent e){
+		        				        	try {
+		        				        	Statement stmt3 = con.createStatement(); 
+		        							stmt3.executeUpdate("DELETE FROM rdv WHERE id= "+id.getText());  
+		        							
+		        				        }
+		        				        	catch(Exception e1){ 
+		        							      System.out.println(e1); 
+		        							}
+		        				        }});
+		        				    
+		        				    frame.add(l);
+		        				    frame.add(id); 
+		        				    
+		        				    frame.add(b);
+		        				    frame.setSize(300,250);
+		        				    frame.setLayout(null);
+		        				    frame.setVisible(true);
+		        				}});
+		        			// ordonnance
+		        			//affichage
+		        			item9.addActionListener(new ActionListener() { 
+		        				public void actionPerformed(ActionEvent e) { 
+		        				String columns[] = { "numord","nompatient","prenompatient","nommedicament","dosagemedicament" }; 
+		        				int i = 0; 
+		        				try
+		        				{ 
+		        				
+		        				Statement stmt6 = con.createStatement(); 
+		        				
+		        				ResultSet res10 = stmt6.executeQuery("SELECT COUNT(1) as NumberOfRows FROM ordonnance"); 
+		        				res10.next(); 
+		        				int nbligne=res10.getInt("NumberOfRows"); 
+		        				String data[][] = new String[nbligne][6]; 
+		        				ResultSet res = stmt6.executeQuery("select * from ordonnance"); 
+		        				while(res.next()) 
+		        				 { 
+		        				 int numord=res.getInt(1); 
+		        				 String nompatient=res.getString(2); 
+		        				 String prenompatient=res.getString(3); 
+		        				String nommedicament=res.getString(4);
+		        				String dosagemedicament=res.getString(5);
+		        				 
+		        				 data[i][0] = numord + ""; 
+		        				 data[i][1] = nompatient; 
+		        				 data[i][2] = prenompatient; 
+		        				 data[i][3]= nommedicament;
+		        				 data[i][4]=dosagemedicament;
+		        				
+		        				 i++; 
+		        				} 
+		        				DefaultTableModel model = new DefaultTableModel(data, columns); 
+		        				JTable table = new JTable(model); 
+		        				table.setShowGrid(true); 
+		        				table.setShowVerticalLines(true); 
+		        				JScrollPane pane = new JScrollPane(table); 
+		        				JFrame f = new JFrame("Liste Des ordonnaces"); 
+		        				JPanel panel = new JPanel(); 
+		        				panel.add(pane); 
+		        				f.add(panel); 
+		        				f.setSize(500, 250); 
+		        				f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); 
+		        				f.setVisible(true); }
+		        				catch(Exception e1){ 
+		        				      System.out.println(e); 
+		        				}}}
+		        				); 
+		        			
+		        				//ajout rdv
+		        			item10.addActionListener(new ActionListener() { 
+		        					public void actionPerformed(ActionEvent e) { 
+		        						  
+		        						  JFrame frame = new JFrame("ajouter ordonnace");
+		        						  frame.getRootPane().setBorder(
+		        							        BorderFactory.createMatteBorder(4, 4, 4, 4, Color.black)
+		        							);
+		        						 JLabel l = new JLabel("NumOrd: ");
+		        						 l.setBounds(20,20, 200,28);  
+		        						 l.setFont(new Font("Comic sans ms", Font.PLAIN, 15));
+		        						 l.setForeground(Color.DARK_GRAY);
+		        					    JTextField numord = new JTextField();
+		        					   numord.setBounds(160,20,200,28);
+		        					    JLabel l1 = new JLabel("NomPatient: ");
+		        						 l1.setBounds(20,60, 200,28);
+		        						 l1.setFont(new Font("Comic sans ms", Font.PLAIN, 15));
+		        						 l1.setForeground(Color.DARK_GRAY);
+		        					    JTextField nompatient = new JTextField();
+		        					    nompatient.setBounds(160,60,200,28);
+		        					    JLabel l2 = new JLabel("PrenomPatient: ");
+		        						 l2.setBounds(20,100, 200,28);
+		        						 l2.setFont(new Font("Comic sans ms", Font.PLAIN, 15));
+		        						 l2.setForeground(Color.DARK_GRAY);
+		        					    JTextField prenompatient = new JTextField();
+		        					    prenompatient.setBounds(160,100,200,28);
+		        					    JLabel l3 = new JLabel("NomMedicament: ");
+		        						 l3.setBounds(20,140, 200,28);
+		        						 l3.setFont(new Font("Comic sans ms", Font.PLAIN, 15));
+		        						 l3.setForeground(Color.DARK_GRAY);
+		        					    JTextField nommedicament = new JTextField();
+		        					   nommedicament.setBounds(160,140,200,28); 
+		        					    JLabel l4 = new JLabel("DosageMedicament: ");
+		        						 l4.setBounds(20,180, 200,28);
+		        						 l4.setFont(new Font("Comic sans ms", Font.PLAIN, 15));
+		        						 l4.setForeground(Color.DARK_GRAY);
+		        					    JTextField dosagemedicament = new JTextField();
+		        					  dosagemedicament.setBounds(160,180,200,28); 
+		        					    //the submit button
+		        					    JButton b = new JButton("SUBMIT");
+		        					    b.setBounds(80,260,170,30);
+		        					    b.setFont(new Font("comic sand ms", Font.PLAIN, 18));
+		        					    b.setBackground(Color.gray);
+		        					    b.setForeground(Color.white);
+		        					    // chnowa isir ki nnzel aal button
+		        					    b.addActionListener(new ActionListener(){
+		        					        public void actionPerformed(ActionEvent e){
+		        					        	try {
+		        					        	Statement stmt6 = con.createStatement(); 
+		        								stmt6.executeUpdate("INSERT INTO ordonnance(numord,nompatient,prenompatient,nommedicament,dosagemedicament) " + "VALUES ("+numord.getText()+",'"+nompatient.getText()+"','"+prenompatient.getText()+"','"+nommedicament.getText()+"','"+nommedicament.getText()+"')");   
+		        					        }
+		        					        	catch(Exception e1){ 
+		        								      System.out.println(e1); 
+		        								}
+		        					        }
+		        					    });
+		        					    //
+		        					    frame.add(l);
+		        					    frame.add(numord); 
+		        					    frame.add(l1);
+		        					    frame.add(nompatient);
+		        					    frame.add(l2);
+		        					    frame.add(prenompatient); 
+		        					    frame.add(l3);
+		        					    frame.add(nommedicament);
+		        					    frame.add(l4);
+		        					    frame.add(dosagemedicament);
+		        					    
+		        					    frame.add(b);
+		        					  
+		        					    frame.setSize(400,400);
+		        					    frame.setLayout(null);
+		        					    frame.setVisible(true);
+		        					 
+		        					        }});
+		        			//modifier rdv
+		        			item11.addActionListener(new ActionListener() { 
+		        				public void actionPerformed(ActionEvent e) { 
+		        					  
+		        					  JFrame frame = new JFrame("modifier ordonnance");
+		        					  
+		        					  frame.getRootPane().setBorder(
+		        						        BorderFactory.createMatteBorder(4, 4, 4, 4, Color.black)
+		        						);
+		        					 JLabel l = new JLabel("NumOrd: ");
+		        					 l.setBounds(20,40, 200,28);  
+		        					 l.setFont(new Font("Comic sans ms", Font.PLAIN, 15));
+		        					 l.setForeground(Color.DARK_GRAY);
+		        				    JTextField numord = new JTextField();
+		        				    numord.setBounds(160,40,200,28);
+		        				    JLabel l1 = new JLabel("NomMedicament: ");
+		        					 l1.setBounds(20,80, 200,28);
+		        					 l1.setFont(new Font("Comic sans ms", Font.PLAIN, 15));
+		        					 l1.setForeground(Color.DARK_GRAY);
+		        				    JTextField nommedicament = new JTextField();
+		        				    nommedicament.setBounds(160,80,200,28);
+		        				    JLabel l2 = new JLabel("DosageMedicament: ");
+		        					 l2.setBounds(20,120, 200,28);
+		        					 l2.setFont(new Font("Comic sans ms", Font.PLAIN, 15));
+		        					 l2.setForeground(Color.DARK_GRAY);
+		        				    JTextField dosagemedicament = new JTextField();
+		        				    dosagemedicament.setBounds(160,120,200,28);
+		        				    JButton b = new JButton("SUBMIT");
+		        				   
+		        				    b.setFont(new Font("comic sand ms", Font.PLAIN, 18));
+		        				    b.setBounds(120,160,150,28);
+		        				    b.setBackground(Color.gray);
+		        				    b.setForeground(Color.white);
+		        				 // chnowa isir ki nnzel aal button
+		        				    b.addActionListener(new ActionListener(){
+		        				        public void actionPerformed(ActionEvent e){
+		        				        	try {
+		        				        	Statement stmt6 = con.createStatement(); 
+		        							stmt6.executeUpdate("UPDATE ordonnance "+"\n"+"SET nommedicament = '"+nommedicament.getText()+"', dosagemedicament= '"+dosagemedicament.getText()+"'"+" WHERE numord = "+numord.getText());  
+		        							
+		        				        }
+		        				        	catch(Exception e1){ 
+		        							      System.out.println(e1); 
+		        							}
+		        				        }});
+		        				    frame.add(l);
+		        				    frame.add(numord); 
+		        				    frame.add(l1);
+		        				    frame.add(nommedicament);
+		        				    frame.add(l2);
+		        				    frame.add(dosagemedicament);
+		        				    frame.add(b);
+		        				    frame.setSize(450,250);
+		        				    frame.setLayout(null);
+		        				    frame.setVisible(true);
+		        				    
+		        				    
+		        				    
+		        				    
+		        				    }});
+		        			// supprimer ordonnance
+		        			item12.addActionListener(new ActionListener() { 
+		        				public void actionPerformed(ActionEvent e) { 
+		        					  
+		        					  JFrame frame = new JFrame("supprimer une ordonnance");
+		        					  frame.getRootPane().setBorder(
+		        						        BorderFactory.createMatteBorder(4, 4, 4, 4, Color.black)
+		        						);
+		        					  
+		        					 JLabel l = new JLabel("NumOrd: ");
+		        					 l.setBounds(20,60, 200,28);  
+		        					 l.setFont(new Font("Comic sans ms", Font.PLAIN, 15));
+		        				    JTextField numord = new JTextField();
+		        				    numord.setBounds(120,60,200,28);
+		        				    
+		        				    JButton b = new JButton("SUBMIT");
+		        				   
+		        				    b.setFont(new Font("comic sand ms", Font.PLAIN, 18));
+		        				    b.setBounds(120,100,150,30);
+		        				    b.setBackground(Color.gray);
+		        				    b.setForeground(Color.white);
+		        				    l.setForeground(Color.DARK_GRAY);
+		        				    
+		        				    // chnowa isir ki nnzel aal button
+		        				    b.addActionListener(new ActionListener(){
+		        				        public void actionPerformed(ActionEvent e){
+		        				        	try {
+		        				        	Statement stmt3 = con.createStatement(); 
+		        							stmt3.executeUpdate("DELETE FROM ordonnance WHERE numord= "+numord.getText());  
+		        							
+		        				        }
+		        				        	catch(Exception e1){ 
+		        							      System.out.println(e1); 
+		        							}
+		        				        }});
+		        				    
+		        				    frame.add(l);
+		        				    frame.add(numord); 
+		        				    
+		        				    frame.add(b);
+		        				    frame.setSize(400,250);
+		        				    frame.setLayout(null);
+		        				    frame.setVisible(true);
+		        				}});
+		        				//étape 5: fermez l'objet de connexion
+		        				
+		        				 
+		        				item13.addActionListener(new ActionListener() { 
+		        				public void actionPerformed(ActionEvent e) { 
+		        				System.exit(0); 
+		        				}});
+		        				jf.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+		        		
+		        				jf.setVisible(true);
+		        		}
+		        	      else {
+		        	    	  
+		        	    	  JFrame f = new JFrame("authentification"); 
+		        	  		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		        	  		JLabel l = new JLabel("nom d'utilisateur ou mot de passe est incorrect! ");
+		        	  		 l.setBounds(20,20,500,35);  
+		        	  		l.setFont(new Font("comic sand ms", Font.PLAIN, 18));
+		        	  		JButton b = new JButton("close");
+		        		    b.setBackground(Color.lightGray);
+		        		    b.setFont(new Font("comic sand ms", Font.PLAIN, 18));
+		        		    b.setBounds(80,80,250,35);
+		        		    b.addActionListener(new ActionListener(){
+    					        public void actionPerformed(ActionEvent e){
+    					        	
+    					        		System.exit(0);
+    					        
+    					        }});
+		        	  		 f.add(l);
+		        	  		 f.add(b);
+		        	  		f.setSize(450,200);
+		        		    f.setLayout(null);
+		        		    f.setVisible(true);
+		        	  		 
+		        	      }
+		        
+		        	      }
+		        	  
+		        	catch(Exception e1){ 
+					      System.out.println(e1); 
+					      
+					}
+		        }
+		    });
+	}}
+		
+		    
+			
+		    	
+		    
+		
